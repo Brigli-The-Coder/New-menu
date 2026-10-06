@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Trattoria — Menu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f6f1;--card:#fafbf8;--ink:#111;--mute:#6f716a;--line:#e3e5dc;--ph:#e4e7dc;
+--serif:"Cormorant Garamond",Georgia,serif;--sans:"Montserrat",Arial,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0;border-radius:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+button{font-family:var(--sans);cursor:pointer;color:var(--ink);background:none;border:1px solid var(--ink);touch-action:manipulation}
+main{padding-bottom:96px}
+
+.tabs{display:flex;gap:40px;padding:30px 40px 6px;overflow-x:auto;white-space:nowrap}
+.tab{border:0;border-bottom:2px solid transparent;padding:10px 0;font-size:13px;letter-spacing:.22em;text-transform:uppercase;color:var(--mute)}
+.tab.on{color:var(--ink);border-bottom-color:var(--ink)}
+
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:28px;padding:28px 40px;max-width:1800px;margin:auto}
+@media(min-width:1700px){.grid{grid-template-columns:repeat(5,1fr)}}
+@media(orientation:portrait){.grid{grid-template-columns:repeat(3,1fr);padding:24px}}
+@media(orientation:portrait) and (max-width:700px){.grid{grid-template-columns:repeat(2,1fr);gap:16px;padding:20px 16px}.tabs{padding:24px 16px 0;gap:26px}}
+
+.card{background:var(--card);display:flex;flex-direction:column}
+.pic{position:relative;aspect-ratio:4/3;background:var(--ph);overflow:hidden;cursor:zoom-in}
+.pic::before{content:attr(data-name);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:16px;text-align:center;font-family:var(--serif);font-size:24px;color:var(--mute)}
+.pic img{position:relative;width:100%;height:100%;object-fit:cover;display:block;transition:transform .35s}
+.pic:hover img{transform:scale(1.03)}
+.badge{position:absolute;z-index:2;top:14px;left:14px;background:var(--ink);color:#fff;font-size:10px;letter-spacing:.2em;text-transform:uppercase;padding:9px 14px}
+.info{padding:20px;display:flex;flex-direction:column;flex:1}
+.name{font-family:var(--serif);font-size:clamp(22px,2vw,30px);line-height:1.15;font-weight:500}
+.cat{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--mute);margin-top:8px}
+.price{font-family:var(--serif);font-size:clamp(22px,2vw,28px);margin:10px 0 16px;font-weight:500}
+.row{display:flex;align-items:center;border:1px solid var(--line);margin-top:auto}
+.row button{border:0;width:52px;height:46px;font-size:20px}
+.row span{flex:1;text-align:center;font-size:15px}
+.add{margin-top:10px;background:var(--ink);color:#fff;padding:16px 8px;font-size:11px;letter-spacing:.18em;text-transform:uppercase}
+.add:active{background:#333}
+
+.bar{position:fixed;left:0;right:0;bottom:0;display:none;justify-content:space-between;align-items:center;text-decoration:none;
+background:var(--ink);color:#fff;padding:20px 40px calc(20px + env(safe-area-inset-bottom,0px));
+font-size:13px;letter-spacing:.2em;text-transform:uppercase;z-index:5}
+.bar span:last-child{font-family:var(--serif);font-size:24px;letter-spacing:.04em;text-transform:none}
+@media(max-width:700px){.bar{padding-left:16px;padding-right:16px}}
+
+/* Modal i fotos */
+.modal{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;
+background:rgba(245,246,241,.97);padding:24px;opacity:0;visibility:hidden;transition:opacity .25s,visibility .25s;cursor:zoom-out}
+.modal.on{opacity:1;visibility:visible}
+.mbox{display:flex;flex-direction:column;align-items:center;gap:16px;max-width:100%;cursor:default;transform:scale(.97);transition:transform .25s}
+.modal.on .mbox{transform:scale(1)}
+.mbox img{display:block;max-width:min(92vw,1100px);max-height:calc(100dvh - 150px);object-fit:contain;background:var(--ph)}
+.cap{display:flex;align-items:baseline;justify-content:center;gap:24px;text-align:center}
+.cap b{font-family:var(--serif);font-size:clamp(24px,4vh,34px);font-weight:500}
+.cap span{font-family:var(--serif);font-size:clamp(22px,3.5vh,30px);color:var(--mute)}
+.mx{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));right:16px;width:52px;height:52px;border:1px solid var(--ink);background:var(--card);display:flex;align-items:center;justify-content:center}
+.mx svg{width:22px;height:22px;stroke:var(--ink);stroke-width:1.8;stroke-linecap:square}
+@media(max-height:500px){.mbox img{max-height:calc(100dvh - 100px)}.cap{gap:16px}}
+</style>
+</head>
+<body>
+
+<main id="app"></main>
+<a class="bar" id="bar" href="order.html"><span id="barL"></span><span id="barR"></span></a>
+
+<div class="modal" id="modal">
+  <button class="mx" id="mx" aria-label="Mbyll"><svg viewBox="0 0 24 24"><path d="M4 4l16 16M20 4L4 20"/></svg></button>
+  <div class="mbox">
+    <img id="mi" src="" alt="">
+    <div class="cap"><b id="mn"></b><span id="mp"></span></div>
+  </div>
+</div>
+
+<script>
+/* img: ose rruga lokale ("./carbonara.jpg") ose URL e plotë nga CDN.
+   Nëse foto mungon ose dështon, shfaqet emri i produktit në vend të saj.
+   badge (opsionale): "I RI", "TRENDING", "BEST SELLER" */
+const P = [
+  {cat:"Ushqim", name:"Spaghetti Carbonara", price:650, img:"./spaghetti-carbonara.jpg", badge:"BEST SELLER"},
+  {cat:"Ushqim", name:"Penne Arrabbiata",    price:550, img:"./penne-arrabiata.jpg"},
+  {cat:"Ushqim", name:"Rizoto me Kërpudha",  price:700, img:"./mushroom-risotto.jpg", badge:"I RI"},
+  {cat:"Ushqim", name:"Rizoto me Karkaleca", price:950, img:"./shrimp-risotto.jpg"},
+  {cat:"Ushqim", name:"Lazanja",             price:750, img:"./lasagna.jpg"},
+  {cat:"Ushqim", name:"Sallatë Cezar",       price:600, img:"./caesar-salad.jpg"},
+
+  {cat:"Mesore", name:"Biftek Viçi",         price:1500, img:"./beef-steak.jpg", badge:"TRENDING"},
+  {cat:"Mesore", name:"Qofte të Furrës",     price:800,  img:"./baked-meatballs.jpg"},
+  {cat:"Mesore", name:"Pulë në Skarë",       price:900,  img:"./grilled-chicken.jpg"},
+  {cat:"Mesore", name:"Kofshë Pule",         price:850,  img:"./chicken-drumsticks.jpg"},
+  {cat:"Mesore", name:"Qengj i Pjekur",      price:1400, img:"./roast-lamb.jpg"},
+  {cat:"Mesore", name:"Kotelet Derri",       price:950,  img:"./pork-chops.jpg"},
+
+  {cat:"Pije", name:"Limonadë",         price:250, img:"./lemonade-glass.jpg", badge:"I RI"},
+  {cat:"Pije", name:"Coca-Cola",        price:200, img:"./cola-glass-ice.jpg"},
+  {cat:"Pije", name:"Ujë Mineral",      price:100, img:"./mineral-water-bottle.jpg"},
+  {cat:"Pije", name:"Birrë",            price:250, img:"./beer-glass.jpg"},
+  {cat:"Pije", name:"Lëng Portokalli",  price:300, img:"./orange-juice-glass.jpg"},
+  {cat:"Pije", name:"Çaj i Ftohtë",     price:250, img:"./iced-tea.jpg"},
+
+  {cat:"Të ngrohta", name:"Espresso",            price:100, img:"./espresso-cup.jpg"},
+  {cat:"Të ngrohta", name:"Cappuccino",          price:150, img:"./cappuccino.jpg", badge:"BEST SELLER"},
+  {cat:"Të ngrohta", name:"Çaj Mali",            price:120, img:"./herbal-tea-cup.jpg"},
+  {cat:"Të ngrohta", name:"Çokollatë e Nxehtë",  price:250, img:"./hot-chocolate.jpg"},
+  {cat:"Të ngrohta", name:"Macchiato",           price:130, img:"./macchiato-coffee.jpg"},
+  {cat:"Të ngrohta", name:"Çaj Jeshil",          price:120, img:"./green-tea-cup.jpg"}
+].map((p,i)=>({...p,id:i}));
+
+const CATS = ["Ushqim","Mesore","Pije","Të ngrohta"];
+
+/* cart: { id: {n:emri, p:cmimi, i:foto, q:sasia} } */
+let cat = CATS[0], sel = {};
+const load = () => { try { return JSON.parse(localStorage.getItem("order")) || {} } catch(e){ return {} } };
+const save = o => { try { localStorage.setItem("order", JSON.stringify(o)) } catch(e){} };
+let cart = load();
+
+const fmt = n => n.toLocaleString("en-US") + " L";
+const count = () => Object.values(cart).reduce((a,x)=>a+x.q,0);
+const total = () => Object.values(cart).reduce((a,x)=>a+x.p*x.q,0);
+
+function updateBar(){
+  const n = count();
+  document.getElementById("bar").style.display = n > 0 ? "flex" : "none";
+  document.getElementById("barL").textContent = `Shiko porosinë (${n})`;
+  document.getElementById("barR").textContent = fmt(total());
+}
+
+/* ===== Modal ===== */
+const modal = document.getElementById("modal");
+function openModal(p){
+  const mi = document.getElementById("mi");
+  mi.src = p.img; mi.alt = p.name;
+  document.getElementById("mn").textContent = p.name;
+  document.getElementById("mp").textContent = fmt(p.price);
+  modal.classList.add("on");
+  document.body.style.overflow = "hidden";
+}
+function closeModal(){
+  modal.classList.remove("on");
+  document.body.style.overflow = "";
+}
+modal.onclick = e => { if(!e.target.closest(".mbox img, .cap")) closeModal(); };
+document.getElementById("mx").onclick = closeModal;
+document.addEventListener("keydown", e => { if(e.key === "Escape") closeModal(); });
+
+/* ===== Menuja ===== */
+function render(){
+  const app = document.getElementById("app");
+  app.innerHTML = `
+    <nav class="tabs">${CATS.map(c=>`<button class="tab ${c===cat?"on":""}" data-c="${c}">${c}</button>`).join("")}</nav>
+    <section class="grid">
+      ${P.filter(p=>p.cat===cat).map(p=>`
+        <article class="card">
+          <div class="pic" data-name="${p.name}" data-id="${p.id}"><img src="${p.img}" alt="${p.name}" loading="lazy" onerror="this.remove()">${p.badge?`<span class="badge">${p.badge}</span>`:""}</div>
+          <div class="info">
+            <h3 class="name">${p.name}</h3>
+            <div class="cat">${p.cat}</div>
+            <div class="price">${fmt(p.price)}</div>
+            <div class="row"><button data-m="${p.id}">−</button><span id="q${p.id}">${sel[p.id]||1}</span><button data-p="${p.id}">+</button></div>
+            <button class="add" data-a="${p.id}">Shto në porosi</button>
+          </div>
+        </article>`).join("")}
+    </section>`;
+
+  app.querySelectorAll(".pic").forEach(el=>el.onclick=()=>{
+    if(!el.querySelector("img")) return;   /* nese foto mungon, s'ka cfare te zmadhohet */
+    openModal(P[el.dataset.id]);
+  });
+  app.querySelectorAll("[data-c]").forEach(b=>b.onclick=()=>{cat=b.dataset.c;render()});
+  app.querySelectorAll("[data-m]").forEach(b=>b.onclick=()=>{const i=b.dataset.m;sel[i]=Math.max(1,(sel[i]||1)-1);document.getElementById("q"+i).textContent=sel[i]});
+  app.querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>{const i=b.dataset.p;sel[i]=(sel[i]||1)+1;document.getElementById("q"+i).textContent=sel[i]});
+  app.querySelectorAll("[data-a]").forEach(b=>b.onclick=()=>{
+    const id=+b.dataset.a, p=P[id], add=sel[id]||1;
+    cart[id] = {n:p.name, p:p.price, i:p.img, q:(cart[id]?cart[id].q:0)+add};
+    save(cart); updateBar();
+    sel[id]=1; document.getElementById("q"+id).textContent=1;
+    b.textContent="U shtua"; setTimeout(()=>b.textContent="Shto në porosi",900);
+  });
+}
+render(); updateBar();
+</script>
+<script src="fulll.js"></script>
+</body>
+</html>
